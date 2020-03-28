@@ -27,7 +27,7 @@ ClientList *newNode(int sockfd) {
 }
 
 int count;
-int server_fd, valread;  
+int server_fd;  
 char *hello = "Hello from server"; 
 ClientList *root, *now;
 
@@ -45,6 +45,7 @@ void send_to_all_clients(ClientList *np, char tmp_buffer[]) {
 
 void client_handler(void *p_client) {
     char buffer[1024]="";
+    int valread;
     ClientList *np = (ClientList *)p_client;
     while(1){
         valread = read(np->data, buffer, 1024); 
