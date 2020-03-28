@@ -17,19 +17,28 @@ struct ClientNode {
 
 int count;
 struct ClientNode list[10];
+int server_fd, new_socket, valread; 
+char buffer[1024] = {0}; 
+char *hello = "Hello from server"; 
+
 
 void client_handler() {
-    printf("thread");
+    while(1){
+        valread = read( new_socket, buffer, 1024); 
+        printf("%s\n",buffer); 
+        send(new_socket, hello, strlen(hello), 0); 
+        printf("Hello message sent\n"); 
+        close(new_socket); 
+    }
+    
 }
 
 int main(int argc, char const *argv[]) { 
-    int server_fd, new_socket, valread; 
+    
     struct sockaddr_in address; 
     int opt = 1; 
     int addrlen = sizeof(address); 
-    char buffer[1024] = {0}; 
-    char *hello = "Hello from server"; 
-
+    
     // Creating socket file descriptor 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) { 
         perror("socket failed"); 
@@ -68,11 +77,7 @@ int main(int argc, char const *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        valread = read( new_socket, buffer, 1024); 
-        printf("%s\n",buffer); 
-        send(new_socket, hello, strlen(hello), 0); 
-        printf("Hello message sent\n"); 
-        close(new_socket); 
+        
     }
     return 0; 
 } 
