@@ -44,9 +44,11 @@ void send_to_all_clients(ClientList *np, char tmp_buffer[]) {
 
 
 void client_handler(void *p_client) {
+    
     char buffer[1024]="";
     int valread;
     ClientList *np = (ClientList *)p_client;
+    send(np->data, hello, strlen(hello), 0); 
     while(1){
         valread = read(np->data, buffer, 1024); 
         if(strcmp(buffer, "exit")==0){
@@ -112,7 +114,7 @@ int main(int argc, char const *argv[]) {
             perror("accept"); 
             exit(EXIT_FAILURE); 
         } 
-
+        printf("CONNESSIONE RICEVUTA");
         ClientList *c = newNode(new_socket);
         c->data = new_socket;
         c->prev = now;

@@ -1,4 +1,4 @@
-all: server.out 
+all: server.out client.out
 
 server.out:
 	gcc -o server.out server.c -pthread
