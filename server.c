@@ -27,16 +27,15 @@ ClientList *newNode(int sockfd) {
 }
 
 int count;
-int server_fd, valread; 
-char buffer[1024] = {0}; 
+int server_fd, valread;  
 char *hello = "Hello from server"; 
 ClientList *root, *now;
 
 void send_to_all_clients(ClientList *np, char tmp_buffer[]) {
     ClientList *tmp = root->link;
     while (tmp != NULL) {
-        if (np->data != tmp->data) { // all clients except itself.
-            printf("Send to sockfd %d: \"%s\" \n", tmp->data, tmp_buffer);
+        if (np->data != tmp->data) { 
+            //printf("Send to sockfd %d: \"%s\" \n", tmp->data, tmp_buffer);
             send(tmp->data, tmp_buffer, 1024, 0);
         }
         tmp = tmp->link;
@@ -45,17 +44,31 @@ void send_to_all_clients(ClientList *np, char tmp_buffer[]) {
 
 
 void client_handler(void *p_client) {
+    char buffer[1024]="";
     ClientList *np = (ClientList *)p_client;
     while(1){
         valread = read(np->data, buffer, 1024); 
+        if(strcmp(buffer, "exit")==0){
+            printf("sono qua");
+            break;
+        }
         if (valread > 0){
-            printf("%s\n",buffer); 
+            printf("%s",buffer); 
             send_to_all_clients(np, buffer);
+            buffer[0] = '\0';
             //send(np->data, hello, strlen(hello), 0); 
             //printf("Hello message sent\n"); 
         }
     }
-    
+    close(np->data);
+    if (np == now) { // remove an edge node
+        now = np->prev;
+        now->link = NULL;
+    } else { // remove a middle node
+        np->prev->link = np->link;
+        np->link->prev = np->prev;
+    }
+    free(np);
 }
 
 int main(int argc, char const *argv[]) { 
