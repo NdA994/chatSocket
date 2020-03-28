@@ -10,25 +10,50 @@
 
 #define PORT 8080 
 
-struct ClientNode {
+typedef struct ClientNode {
     int data;
-    char ip[16];
-};
+    struct ClientNode* prev;
+    struct ClientNode* link;
+    //char ip[16];
+} ClientList;
+
+ClientList *newNode(int sockfd) {
+    ClientList *np = (ClientList *)malloc( sizeof(ClientList) );
+    np->data = sockfd;
+    np->prev = NULL;
+    np->link = NULL;
+    //strncpy(np->ip, ip, 16);
+    return np;
+}
 
 int count;
-struct ClientNode list[10];
-int server_fd, new_socket, valread; 
+int server_fd, valread; 
 char buffer[1024] = {0}; 
 char *hello = "Hello from server"; 
+ClientList *root, *now;
+
+void send_to_all_clients(ClientList *np, char tmp_buffer[]) {
+    ClientList *tmp = root->link;
+    while (tmp != NULL) {
+        if (np->data != tmp->data) { // all clients except itself.
+            printf("Send to sockfd %d: \"%s\" \n", tmp->data, tmp_buffer);
+            send(tmp->data, tmp_buffer, 1024, 0);
+        }
+        tmp = tmp->link;
+    }
+}
 
 
-void client_handler() {
+void client_handler(void *p_client) {
+    ClientList *np = (ClientList *)p_client;
     while(1){
-        valread = read( new_socket, buffer, 1024); 
-        printf("%s\n",buffer); 
-        send(new_socket, hello, strlen(hello), 0); 
-        printf("Hello message sent\n"); 
-        //close(new_socket); 
+        valread = read(np->data, buffer, 1024); 
+        if (valread > 0){
+            printf("%s\n",buffer); 
+            send_to_all_clients(np, buffer);
+            //send(np->data, hello, strlen(hello), 0); 
+            //printf("Hello message sent\n"); 
+        }
     }
     
 }
@@ -63,16 +88,25 @@ int main(int argc, char const *argv[]) {
         perror("listen"); 
         exit(EXIT_FAILURE); 
     } 
+
+    root = newNode(server_fd);
+    now = root;
+
     while(1){
+        int new_socket;
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) { 
             perror("accept"); 
             exit(EXIT_FAILURE); 
         } 
 
-        struct ClientNode *c;
+        ClientList *c = newNode(new_socket);
+        c->data = new_socket;
+        c->prev = now;
+        now->link = c;
+        now = c;
 
         pthread_t id;
-        if (pthread_create(&id, NULL, (void *)client_handler, NULL) != 0) {
+        if (pthread_create(&id, NULL, (void *)client_handler, (void *)c) != 0) {
             perror("Create pthread error!\n");
             exit(EXIT_FAILURE);
         }
