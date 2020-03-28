@@ -28,7 +28,7 @@ void client_handler() {
         printf("%s\n",buffer); 
         send(new_socket, hello, strlen(hello), 0); 
         printf("Hello message sent\n"); 
-        close(new_socket); 
+        //close(new_socket); 
     }
     
 }
