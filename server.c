@@ -173,16 +173,28 @@ void send_to_all_clients(ClientList *np, char tmp_buffer[]) {
 }
 
 void client_handler(void *p_client) {
+    ClientList *np = (ClientList *)p_client;
+
     while(1){
         char buffer[1024] = {0}; 
-        ClientList *np = (ClientList *)p_client;
         send(np->data , hello , strlen(hello) , 0 ); 
         printf("Hello message sent\n"); 
         int valread = read(np->data , buffer, 1024); 
         printf("%s\n",buffer );   
         send_to_all_clients(np, buffer);
-
+        if(strcmp(buffer, "quit")==0){
+            break;
+        }
     } 
+    close(np->data);
+    if (np == now) { // remove an edge node
+        now = np->prev;
+        now->link = NULL;
+    } else { // remove a middle node
+        np->prev->link = np->link;
+        np->link->prev = np->prev;
+    }
+    free(np);
 }
 
 int main(int argc, char const *argv[]) { 
@@ -231,10 +243,29 @@ int main(int argc, char const *argv[]) {
     
     
     while(1){
+        /*
         int new_socket;
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) { 
             perror("accept"); 
             exit(EXIT_FAILURE);  
+        } 
+
+        ClientList *c = newNode(new_socket);
+        c->data = new_socket;
+        c->prev = now;
+        now->link = c;
+        now = c;
+
+        pthread_t id;
+        if (pthread_create(&id, NULL, (void *)client_handler, (void *)c) != 0) {
+            perror("Create pthread error!\n");
+            exit(EXIT_FAILURE);
+        }
+        */
+        int new_socket;
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) { 
+            perror("accept"); 
+            exit(EXIT_FAILURE); 
         } 
 
         ClientList *c = newNode(new_socket);

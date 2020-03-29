@@ -67,6 +67,7 @@ void client_handler() {
         if(strcmp(string, "quit")==0){
             printf("QUIT SIIIIII\n");
             stop = 1;
+            break;
         }
         printf("Message sent\n"); 
     }
