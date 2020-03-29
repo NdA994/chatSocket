@@ -62,7 +62,7 @@ void client_handler() {
     while(1){
         char string[256];
         scanf("%s", string);
-        printf("%s\n", string);
+        //printf("%s\n", string);
         send(sock, string, strlen(string) , 0 ); 
         if(strcmp(string, "quit")==0){
             printf("QUIT SIIIIII\n");

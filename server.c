@@ -174,10 +174,9 @@ void send_to_all_clients(ClientList *np, char tmp_buffer[]) {
 
 void client_handler(void *p_client) {
     ClientList *np = (ClientList *)p_client;
-
+    send(np->data , hello , strlen(hello) , 0 ); 
     while(1){
         char buffer[1024] = {0}; 
-        send(np->data , hello , strlen(hello) , 0 ); 
         printf("Hello message sent\n"); 
         int valread = read(np->data , buffer, 1024); 
         printf("%s\n",buffer );   
