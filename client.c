@@ -111,10 +111,6 @@ int main(int argc, char const *argv[])
         if(strlen(buffer)!=0){
             printf("%s\n",buffer );
         }
-        if(stop == 1){
-            printf("STOP");
-            break;
-        }
     }
     return 0; 
 } 

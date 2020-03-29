@@ -161,6 +161,17 @@ int server_fd;
 char *hello = "Hello from server"; 
 ClientList *root, *now;
 
+void send_to_all_clients(ClientList *np, char tmp_buffer[]) {
+    ClientList *tmp = root->link;
+    while (tmp != NULL) {
+        if (np->data != tmp->data) { 
+            //printf("Send to sockfd %d: \"%s\" \n", tmp->data, tmp_buffer);
+            send(tmp->data, tmp_buffer, 1024, 0);
+        }
+        tmp = tmp->link;
+    }
+}
+
 void client_handler(void *p_client) {
     while(1){
         char buffer[1024] = {0}; 
@@ -169,6 +180,8 @@ void client_handler(void *p_client) {
         printf("Hello message sent\n"); 
         int valread = read(np->data , buffer, 1024); 
         printf("%s\n",buffer );   
+        send_to_all_clients(np, buffer);
+
     } 
 }
 
