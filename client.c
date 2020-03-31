@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
     serv_addr.sin_port = htons(PORT); 
        
     // inet_pton() converte gli indirizzi IPv4 e IPv6 da testo in binario 
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
+    if(inet_pton(AF_INET, "52.15.141.237", &serv_addr.sin_addr)<=0)  
     { 
         printf("\nInvalid address/ Address not supported \n"); 
         return -1; 
