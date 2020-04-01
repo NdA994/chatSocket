@@ -5,5 +5,5 @@ Per lanciare l'applicazione:
 ```
 make 
 ./server.out 
-./client.out [indirizzo client]
+./client.out [indirizzo server]
 ```
